@@ -1,6 +1,10 @@
-/** @type {import('next').NextConfig} */
+// Import the next-remove-imports package
+const removeImports = require("next-remove-imports")();
+
+// Define your Next.js configuration
 const nextConfig = {
   reactStrictMode: true,
-}
+};
 
-module.exports = nextConfig
+// Apply the removeImports transformation to the nextConfig
+module.exports = removeImports(nextConfig);
