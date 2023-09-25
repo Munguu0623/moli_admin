@@ -7,36 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model BlogAuthor {
-  AuthorID   Int?
-  AuthorName String?   @db.VarChar(255)
-  CreateDate DateTime? @db.DateTime
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Persons {
-  PersonID  Int?
-  LastName  String? @db.VarChar(255)
-  FirstName String? @db.VarChar(255)
-  Address   String? @db.VarChar(255)
-  City      String? @db.VarChar(255)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Test {
-  PersonID  Int?
-  LastName  String? @db.NVarChar(255)
-  FirstName String? @db.NVarChar(255)
-  Address   String? @db.NVarChar(255)
-  City      String? @db.VarChar(255)
-
-  @@ignore
-}
 
 model User {
   ID           Int    @id(map: "PK__User__3214EC273C740EC5") @default(autoincrement())
@@ -67,4 +37,25 @@ model BlogsTests {
   ID              Int     @id(map: "PK__BlogsTes__3214EC2765DC5D58") @default(autoincrement())
   BlodTitle       String? @db.NVarChar(255)
   BlogDescription String? @db.NVarChar(Max)
+
+}
+
+// model Post {
+//   ID              Int      @id(map: "PK__Post__3214EC2765DC5ER58") @default(autoincrement())
+//   BlogTitle       String? @db.NVarChar(255)
+//   BlogDescription String? @db.NVarChar(Max)
+// }
+
+model Post {
+  id          Int  @id(map: "PK__Post__3214EC2765DC5ER58") @default(autoincrement())
+  postType    String
+  propession  String
+  description String?
+  title       String
+  createdAt   DateTime  @default(now())
+  publishedAt DateTime?
+  coverImage String?
+  published Boolean @default(false)
+
+  @@map("posts")
 }
