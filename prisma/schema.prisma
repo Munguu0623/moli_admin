@@ -3,59 +3,27 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlserver"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  ID           Int    @id(map: "PK__User__3214EC273C740EC5") @default(autoincrement())
-  Username     String @db.NVarChar(255)
-  Email        String @db.NVarChar(255)
-  PasswordHash String @db.NVarChar(255)
+  id        String   @id @default(cuid())
+  name      String?
+  email     String?  @unique
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-
-model Blog {
-  ID              Int     @id(map: "PK__Blog__3214EC27F81CFA82") @default(autoincrement())
-  BlodTitle       String? @db.NVarChar(255)
-  BlogDescription String? @db.Text
-}
-
-model Blogs {
-  ID              Int     @id(map: "PK__Blogs__3214EC27DA3492A1") @default(autoincrement())
-  BlodTitle       String? @db.NVarChar(255)
-  BlogDescription String? @db.Text
-}
-
-model BlogsTest {
-  ID              Int     @id(map: "PK__BlogsTes__3214EC274CE73BDA") @default(autoincrement())
-  BlodTitle       String? @db.NVarChar(255)
-  BlogDescription String? @db.NVarChar(1)
-}
-
-model BlogsTests {
-  ID              Int     @id(map: "PK__BlogsTes__3214EC2765DC5D58") @default(autoincrement())
-  BlodTitle       String? @db.NVarChar(255)
-  BlogDescription String? @db.NVarChar(Max)
-
-}
-
-// model Post {
-//   ID              Int      @id(map: "PK__Post__3214EC2765DC5ER58") @default(autoincrement())
-//   BlogTitle       String? @db.NVarChar(255)
-//   BlogDescription String? @db.NVarChar(Max)
-// }
 
 model Post {
-  id          Int  @id(map: "PK__Post__3214EC2765DC5ER58") @default(autoincrement())
-  postType    String
-  propession  String
-  description String?
-  title       String
-  createdAt   DateTime  @default(now())
-  publishedAt DateTime?
-  coverImage String?
-  published Boolean @default(false)
-
-  @@map("posts")
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  data      String?
+  category  String?
+  type      String?
+  // author    User?    @relation(fields: [authorId], references: [id])
+  // authorId  Int?
 }
