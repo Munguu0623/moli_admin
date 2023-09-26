@@ -69,6 +69,7 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData }) => {
                 <Select.Option value="medical">Ангаах</Select.Option>
                 <Select.Option value="tech">Мэдээлэл технологи</Select.Option>
                 <Select.Option value="eng">Инженер</Select.Option>
+                <Select.Option value="eng">батлан хамгаалах</Select.Option>
               </Select>
 
               <Tag
