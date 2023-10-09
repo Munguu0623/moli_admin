@@ -16,7 +16,7 @@ type MenuItem = Required<MenuProps>["items"][number];
 
 function getItem(
   label: React.ReactNode,
-  Menulink?: String,
+  menulink?: String,
   key?: React.Key,
   icon?: React.ReactNode,
   children?: MenuItem[]
@@ -26,7 +26,7 @@ function getItem(
     icon,
     children,
     label,
-    Menulink,
+    menulink,
   } as MenuItem;
 }
 
@@ -40,7 +40,7 @@ const items: MenuItem[] = [
   ]),
 ];
 
-console.log("this is items type" + typeof items);
+// console.log("this is items type" + typeof items);
 export default function HomeLayout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const {

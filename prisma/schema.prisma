@@ -7,15 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String?  @unique
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Post {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -26,4 +17,21 @@ model Post {
   type      String?
   // author    User?    @relation(fields: [authorId], references: [id])
   // authorId  Int?
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  name     String?
+  sessions Session[] // <-- This line is the back-reference to Session
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  user         User     @relation(fields: [userId], references: [id])
 }

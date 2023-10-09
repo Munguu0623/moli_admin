@@ -1,35 +1,57 @@
-import { NextApiHandler } from "next";
-import NextAuth, { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth from "next-auth";
+import Providers from "next-auth/providers";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import axios from 'axios';
+import Credentials from "next-auth/providers/credentials";
 
-import prisma from "@/lib/prisma";
+import prisma from "../../../lib/prisma";  // adjust the path to your prisma instance
+import { NextApiRequest, NextApiResponse } from "next";
+import { User } from "@/utils/types";;  // adjust the path to your types file
 
-const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, options);
-export default authHandler;
-
-const options: NextAuthOptions = {
+export default NextAuth({
   providers: [
-    CredentialsProvider({
-      type: "credentials",
+    Credentials({
+      id: 'credentials',
+      name: 'Credentials',
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "Username" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
       },
-      async authorize(credentials: { username: string; password: string; }, req: any) {
-        const { username, password } = credentials;
-        const result = await axios.post(`${process.env.URL}/api/auth/login`, {
-          username: username,
-          password: password,
+      authorize: async (credentials) => {
+        console.log(credentials.email, "-----");
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
         });
-        const body = result.data;
-        // if (body.status !== 200 || !body.success) {
-        //   return null;
-        // }
-      },
-    }),
+        console.log(user, "user------");
+        if (!user || user.password !== credentials.password) {
+          return null;
+        }
+
+        const { password, ...rest } = user;
+        console.log(password, rest, ' rest');
+        return {
+          ...rest,
+          id: user.id.toString()
+        };
+      }
+    })
   ],
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  callbacks: {
+    async session({ session, token, user }: any) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id.toString(),
+          email: user.email,
+        },
+      };
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+
   adapter: PrismaAdapter(prisma),
-  secret: process.env.SECRET,
-};
+});
