@@ -12,7 +12,13 @@ import Link from "next/link";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = {
+  key: React.Key;
+  label: React.ReactNode;
+  Menulink?: string;
+  icon?: React.ReactNode;
+  children?: MenuItem[];
+};
 
 function getItem(
   label: React.ReactNode,
@@ -55,6 +61,13 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
         onCollapse={(value) => setCollapsed(value)}
       >
         <div className="demo-logo-vertical" />
+        {/* <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+          {items.map((item) => (
+            <Menu.Item key={item.key} icon={item.icon}>
+              <Link href={item.Menulink || ""}>{item.label}</Link>
+            </Menu.Item>
+          ))}
+        </Menu> */}
 
         <Menu
           theme="dark"
