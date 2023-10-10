@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Button, Form, Input, Select, Tag } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import MarkdownRenderer from "../components/markdown-render";
-import { Notif } from "../components/notification";
 import { getSortedPostsData } from "@/pages/lib/posts";
 import HomeLayout from "../components/Layout";
 import Editor from "../components/common/Editor";
@@ -12,6 +11,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IBlog } from "@/utils/types";
+import { Notif } from "../components/notification";
+import axios from "axios";
 const formSchema = z.object({
   title: z
     .string({
@@ -34,58 +35,52 @@ type TProps = {
 
 const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
   const [type, setType] = useState("");
+  const [value, setValue] = useState("**нийтлэл бичэх хэсэг**");
+
   // const [body, setBody] = useState(post?.body || "");
   const firstPostContent = allPostsData.allPostsData[0].content; // how to fix this is error Property 'content' does not exist on type 'string'?
-  console.log(type + "type");
+  const [form] = Form.useForm();
 
   // form beltgej baina
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: (posts && posts.posts && posts.posts.BlodTitle) || "",
-      description: (posts && posts.posts && posts.posts.BlogDescription) || "",
-    },
-  });
+  // const form = useForm<z.infer<typeof formSchema>>({
+  //   resolver: zodResolver(formSchema),
+  //   defaultValues: {
+  //     title: (posts && posts.posts && posts.posts.BlodTitle) || "",
+  //     description: (posts && posts.posts && posts.posts.BlogDescription) || "",
+  //   },
+  // });
 
-  // const submitBlog = () => {
-  //   type == ""
-  //     ? Notif("Анхаар", "Та нийтлэх төрөл сонгоогүй байна!!!", "warning")
-  //     : "";
-  // };
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: any) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
     const finalValues = {
       ...values,
-      publishedAt: values.published ? new Date() : null,
+      data: value,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
+    console.log(finalValues, "values");
 
-    if (posts) {
-      fetch("/api/user/post", {
-        method: "POST",
-        body: JSON.stringify(finalValues),
+    axios
+      .post("/api/user/post", {
+        form: finalValues,
       })
-        .then((res) => res.json())
-        .then(({ post, error }) => {
-          Notif("Амжилттай", "Амжилттай хадгаллаа!!!", "success");
-
-          if (error) {
-            throw new Error(error.message);
-          }
-        })
-        .catch((error) => {
-          console.log(error.message);
-          Notif("Амжилттай", "Илгээхэд алдаа гарсан!!!", "error");
-        });
-    }
+      .then(({ data }) => {
+        console.log(data, "res.data");
+        Notif("Амжилттай", "Амжилттай хадгаллаа!!!", "success");
+      })
+      .catch((error) => {
+        console.log(error.message);
+        Notif("Амжилттай", "Илгээхэд алдаа гарсан!!!", "error");
+      });
   }
 
   return (
     <HomeLayout>
       <div>
         <Form
-          {...form}
+          form={form}
+          onFinish={onSubmit}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
@@ -96,43 +91,42 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
             <Button
               type="primary"
               className="bg-blue-500"
-              onClick={form.handleSubmit(onSubmit)}
+              onClick={() => form.submit()}
             >
               Нийтлэх
             </Button>
           </Form.Item>
-          <Form.Item label="Төрөл">
+          <Form.Item label="Төрөл" name="type">
             <Select
               onChange={(value) => {
-                console.log("Selected value:", value);
                 setType(value);
-                console.log("Type state:", type);
               }}
             >
               <Select.Option value="blog">Нийтлэл & Влог</Select.Option>
               <Select.Option value="profession">Мэргэжил</Select.Option>
             </Select>
-            <p className=" text-slate-500">
-              Нийтлэл үү? эсвэл мэргэжилийн танилцуулга уу та сонгоно уу?
-            </p>
           </Form.Item>
+          <p className=" text-slate-500">
+            Нийтлэл үү? эсвэл мэргэжилийн танилцуулга уу та сонгоно уу?
+          </p>
 
-          <Form.Item label="Гарчиг">
+          <Form.Item label="Гарчиг" name="title">
             <Input />
-            <p className=" text-slate-500">
-              Гарчиг ойлгомжтой, товч, тодорхой байх хэрэгтэй
-            </p>
           </Form.Item>
+          <p className=" text-slate-500">
+            Гарчиг ойлгомжтой, товч, тодорхой байх хэрэгтэй
+          </p>
 
-          {type == "profession" ? (
-            <Form.Item label="Категори">
-              <Select>
-                <Select.Option value="blog">Хүмүүнлэг</Select.Option>
-                <Select.Option value="medical">Ангаах</Select.Option>
-                <Select.Option value="tech">Мэдээлэл технологи</Select.Option>
-                <Select.Option value="eng">Инженер</Select.Option>
-              </Select>
-
+          {type == "profession" && (
+            <>
+              <Form.Item label="Категори" name="category">
+                <Select>
+                  <Select.Option value="blog">Хүмүүнлэг</Select.Option>
+                  <Select.Option value="medical">Ангаах</Select.Option>
+                  <Select.Option value="tech">Мэдээлэл технологи</Select.Option>
+                  <Select.Option value="eng">Инженер</Select.Option>
+                </Select>
+              </Form.Item>
               <Tag
                 icon={<ExclamationCircleOutlined />}
                 color="warning"
@@ -145,15 +139,13 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
                   className="prose prose-sm  text-[0.60rem] "
                 />
                 {/* <Markdown class="prose prose-sm text-orange-400">
-                  {firstPostContent}
-                </Markdown> */}
+            {firstPostContent}
+          </Markdown> */}
               </Tag>
-            </Form.Item>
-          ) : (
-            <></>
+            </>
           )}
         </Form>
-        <Editor />
+        <Editor value={value} setValue={setValue} />
       </div>
     </HomeLayout>
   );
