@@ -13,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IBlog } from "@/utils/types";
 import { Notif } from "../components/notification";
 import axios from "axios";
+import { slugify } from "@/utils/slugify";
+import dayjs from "dayjs";
 const formSchema = z.object({
   title: z
     .string({
@@ -55,9 +57,14 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
     // ✅ This will be type-safe and validated.
     const finalValues = {
       ...values,
-      data: value,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      content: value,
+      image:
+        "https://rukminim2.flixcart.com/image/416/416/kc54ivk0/poster/5/h/u/medium-naruto-wall-poster-for-room-with-gloss-lamination-m50-original-imaftbccndqefpys.jpeg?q=70",
+      slug: slugify(values.title),
+      authorId: 1,
+      category: 2,
+      createdDate: dayjs(),
+      modifiedDate: dayjs(),
     };
     console.log(finalValues, "values");
 
