@@ -3,35 +3,52 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String
-  data      String?
-  category  String?
-  type      String?
-  // author    User?    @relation(fields: [authorId], references: [id])
-  // authorId  Int?
-}
-
-model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  password String
-  name     String?
-  sessions Session[] // <-- This line is the back-reference to Session
-}
-
-model Session {
+model Blogs {
   id           Int      @id @default(autoincrement())
-  userId       Int
-  expires      DateTime
-  sessionToken String   @unique
-  accessToken  String   @unique
-  user         User     @relation(fields: [userId], references: [id])
+  title        String
+  slug         String
+  content      String?
+  image        String   @db.VarChar(255)
+  category     Int?
+  type         String?
+  authorId     Int?
+  createdDate  DateTime @default(now())
+  modifiedDate DateTime @updatedAt
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Menu {
+  id           String    @id
+  name         String?   @db.NVarChar(100)
+  parentMenuId String?   @db.VarChar(100)
+  menuType     String?   @db.VarChar(100)
+  menuUrl      String?   @db.NVarChar(1000)
+  isVisible    Int?
+  createdDate  DateTime?
+  modifiedDate DateTime?
+}
+
+model RoleMenu {
+  id          Int      @id @default(autoincrement())
+  roleId      String   @db.VarChar(100)
+  menuId      String   @db.VarChar(100)
+  createdDate DateTime
+}
+
+model Users {
+  id           Int       @id @default(autoincrement())
+  firstName    String?   @db.NVarChar(100)
+  password     String    @db.NVarChar(1000)
+  phoneNumber  String?   @db.NVarChar(100)
+  email        String?   @unique @db.NVarChar(100)
+  createdDate  DateTime
+  modifiedDate DateTime?
 }
