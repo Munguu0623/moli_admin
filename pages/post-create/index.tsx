@@ -13,16 +13,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IBlog } from "@/utils/types";
 import { Notif } from "../components/notification";
 import axios from "axios";
-const formSchema = z.object({
-  title: z
-    .string({
-      required_error: "Гарчиг оруулна уу",
-    })
-    .max(50),
-  description: z.string(),
-  published: z.boolean(),
-});
 
+import EditorJS from "@editorjs/editorjs";
+// import CustomEditor from "../components/editor/configuration";
+import dynamic from "next/dynamic";
 type TProps = {
   data: {
     posts: IBlog;
@@ -33,9 +27,18 @@ type TProps = {
   };
 };
 
+// Editor
+const CustomEditor = dynamic(
+  () => import("../components/editor/configuration"),
+  {
+    ssr: false,
+  }
+);
+
 const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
   const [type, setType] = useState("");
   const [value, setValue] = useState("**нийтлэл бичэх хэсэг**");
+  const [content, setContent] = useState("");
 
   // const [body, setBody] = useState(post?.body || "");
   const firstPostContent = allPostsData.allPostsData[0].content; // how to fix this is error Property 'content' does not exist on type 'string'?
@@ -51,8 +54,6 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
   // });
 
   function onSubmit(values: any) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     const finalValues = {
       ...values,
       data: value,
@@ -145,6 +146,11 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData, data: posts }) => {
             </>
           )}
         </Form>
+        {/* <CustomEditor setContent={setContent} content={content} />
+        <button className="save_btn" onClick={() => console.log(content)}>
+          Save
+        </button> */}
+
         <Editor value={value} setValue={setValue} />
       </div>
     </HomeLayout>

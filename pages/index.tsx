@@ -1,23 +1,32 @@
 // Import the getPosts function if it's not already imported.
-import { getPosts } from "@/lib/prisma/posts";
+
+import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { IBlog } from "@/utils/types"; // Make sure to import TPost or the appropriate type.
 import HomeLayout from "./components/Layout";
 import ReactMarkdown from "react-markdown";
 import MarkdownRenderer from "./components/markdown-render";
-import React from "react";
 import { getSession } from "next-auth/react";
 import { Session } from "next-auth";
-
+import dynamic from "next/dynamic";
+import { Button } from "antd";
 interface HomeProps {
   posts: IBlog[];
 }
+const EditorOutput = dynamic(
+  () => import("./components/editor/configuration"),
+  {
+    ssr: false,
+  }
+);
 
 const Home: NextPage<HomeProps> = ({ posts }) => {
+  const [content, setContent] = useState("");
   return (
     <HomeLayout>
-      {/* <div>
-        {posts.map((el) => (
+      <div>
+        hello
+        {/* {posts.map((el) => (
           <div key={el.ID}>
             <MarkdownRenderer
               className="prose prose-sm"
@@ -31,8 +40,8 @@ const Home: NextPage<HomeProps> = ({ posts }) => {
               className="prose prose-sm"
             />
           </div>
-        ))}
-      </div> */}
+        ))} */}
+      </div>
     </HomeLayout>
   );
 };
