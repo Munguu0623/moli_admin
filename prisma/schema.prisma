@@ -8,21 +8,24 @@ datasource db {
 }
 
 model Blogs {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   title        String
   slug         String
-  content      String?
-  image        String   @db.VarChar(255)
+  content      String?   @db.NVarChar(Max)
   category     Int?
   type         String?
-  authorId     Int?
-  createdDate  DateTime @default(now())
-  modifiedDate DateTime @updatedAt
+  authorId     Int
+  modifiedDate DateTime  @updatedAt
+  image        String    @db.VarChar(255)
+  createdDate  DateTime  @default(now())
+  Users        Users     @relation(fields: [authorId], references: [id])
+  Category     Category? @relation(fields: [category], references: [id])
 }
 
 model Category {
-  id   Int    @id @default(autoincrement())
-  name String
+  id    Int     @id @default(autoincrement())
+  name  String
+  Blogs Blogs[]
 }
 
 model Menu {
@@ -30,7 +33,7 @@ model Menu {
   name         String?   @db.NVarChar(100)
   parentMenuId String?   @db.VarChar(100)
   menuType     String?   @db.VarChar(100)
-  menuUrl      String?   @db.NVarChar(1000)
+  menuUrl      String?
   isVisible    Int?
   createdDate  DateTime?
   modifiedDate DateTime?
@@ -46,9 +49,10 @@ model RoleMenu {
 model Users {
   id           Int       @id @default(autoincrement())
   firstName    String?   @db.NVarChar(100)
-  password     String    @db.NVarChar(1000)
+  password     String
   phoneNumber  String?   @db.NVarChar(100)
   email        String?   @unique @db.NVarChar(100)
-  createdDate  DateTime
-  modifiedDate DateTime?
+  createdDate  DateTime  @db.DateTime
+  modifiedDate DateTime? @db.DateTime
+  Blogs        Blogs[]
 }

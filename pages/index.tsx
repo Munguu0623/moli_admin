@@ -9,39 +9,31 @@ import MarkdownRenderer from "./components/markdown-render";
 import { getSession } from "next-auth/react";
 import { Session } from "next-auth";
 import dynamic from "next/dynamic";
-import { Button } from "antd";
+
+import { Button, Col, Row, Statistic, Progress } from "antd";
+import { MenuView } from "./components/menu-view";
 interface HomeProps {
   posts: IBlog[];
 }
-const EditorOutput = dynamic(
-  () => import("./components/editor/configuration"),
-  {
-    ssr: false,
-  }
-);
 
 const Home: NextPage<HomeProps> = ({ posts }) => {
   const [content, setContent] = useState("");
   return (
     <HomeLayout>
       <div>
-        hello
-        {/* {posts.map((el) => (
-          <div key={el.ID}>
-            <MarkdownRenderer
-              className="prose prose-sm"
-              key={el.ID}
-              content={el.BlodTitle}
-            />
-            <br />
-            <MarkdownRenderer
-              key={el.ID}
-              content={el.BlogDescription}
-              className="prose prose-sm"
-            />
-          </div>
-        ))} */}
+        <Row gutter={16}>
+          <Col span={12}>
+            <Statistic title="Нийт хэрэглэгчид" value={112893} />
+          </Col>
+          <Col span={12}>
+            <Statistic title="Нийт төлбөр (₮)" value={1112893} precision={2} />
+          </Col>
+          <Col span={12}>
+            <Statistic title="Идэвхтэй хэрэглэгч" value={1322893} loading />
+          </Col>
+        </Row>
       </div>
+      <MenuView />
     </HomeLayout>
   );
 };
