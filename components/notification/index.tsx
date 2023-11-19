@@ -1,6 +1,6 @@
 import { notification } from "antd";
 
-export function Notif(
+export function Notification(
   message: string,
   description: string,
   type: "success" | "info" | "warning" | "error"

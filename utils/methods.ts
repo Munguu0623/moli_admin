@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import type { Dispatch, SetStateAction } from "react";
 import dayjs from "dayjs";
-import { SectionType, ICourse, IEvent } from "./types";
+import { SectionType, ICourse, IEvent } from "@/utils/types";
 
 export const normalizedData = <T extends object>(
     data: T[],
@@ -81,7 +81,7 @@ export const courseSorting = (
         case "latest": {
             const sorted = cousesCopy.sort((a, b) =>
                 new Date(a.published_at).getTime() >
-                new Date(b.published_at).getTime()
+                    new Date(b.published_at).getTime()
                     ? -1
                     : 1
             );
@@ -166,11 +166,11 @@ export const minutesToHours = (minutes: number): string => {
 export const flatDeep = <T>(arr: any[], d = 1): T[] => {
     return d > 0
         ? arr.reduce((acc, val) => {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-              return acc.concat(
-                  Array.isArray(val) ? flatDeep<T>(val, d - 1) : val
-              );
-          }, [])
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            return acc.concat(
+                Array.isArray(val) ? flatDeep<T>(val, d - 1) : val
+            );
+        }, [])
         : arr.slice();
 };
 

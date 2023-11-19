@@ -1,52 +1,29 @@
-import { NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 
 import React, { useState } from "react";
 import { Button, Form, Input, Select, Tag } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import MarkdownRenderer from "../components/markdown-render";
-import { getSortedPostsData } from "@/pages/lib/posts";
-import HomeLayout from "../components/Layout";
-import Editor from "../components/common/Editor";
-import { useForm } from "react-hook-form";
+import HomeLayout from "@/components/Layout";
+import Editor from "@/components/common/Editor";
 import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { IBlog } from "@/utils/types";
-import { Notif } from "../components/notification";
+import { Notification } from "@/components/notification";
 import axios from "axios";
 import { slugify } from "@/utils/slugify";
 import dayjs from "dayjs";
-import { CategoryType } from "../utils/types";
+import { CategoryType } from "@/utils/types";
 import { PrismaClient } from ".prisma/client";
+import { Session } from "next-auth";
+import { getSession } from "next-auth/react";
 const prisma = new PrismaClient();
-const formSchema = z.object({
-  title: z
-    .string({
-      required_error: "Гарчиг оруулна уу",
-    })
-    .max(50),
-  description: z.string(),
-  published: z.boolean(),
-});
 
 type TProps = {
-  data: {
-    posts: IBlog;
-    allPostsData: {
-      content: string;
-    }[];
-    category: CategoryType[];
-  };
+  category: CategoryType[];
+  user: any;
 };
 
-const CreatePost: NextPage<TProps> = ({
-  data: allPostsData,
-  data: category,
-  data: posts,
-}) => {
+const CreatePost: NextPage<TProps> = ({ category, user }) => {
   const [type, setType] = useState("");
   const [value, setValue] = useState("**нийтлэл бичэх хэсэг**");
-  const firstPostContent = allPostsData.allPostsData[0].content;
-  const categoryName = category.category;
+
   const [form] = Form.useForm();
 
   console.log(slugify("asdkfljfa  laskjfas jalskdfjslfdj lasd"));
@@ -69,16 +46,16 @@ const CreatePost: NextPage<TProps> = ({
       })
       .then(({ data }) => {
         console.log(data, "res.data");
-        Notif("Амжилттай", "Амжилттай хадгаллаа!!!", "success");
+        Notification("Амжилттай", "Амжилттай хадгаллаа!!!", "success");
       })
       .catch((error) => {
         console.log(error.message);
-        Notif("Анхаар", "Илгээхэд алдаа гарсан!!!", "error");
+        Notification("Анхаар", "Илгээхэд алдаа гарсан!!!", "error");
       });
   }
 
   return (
-    <HomeLayout>
+    <HomeLayout menu={user.menu}>
       <div className="flex">
         <div className="">
           <Form
@@ -126,7 +103,7 @@ const CreatePost: NextPage<TProps> = ({
               <>
                 <Form.Item label="Категори" name="category">
                   <Select
-                    options={(categoryName || []).map((d) => ({
+                    options={(category || []).map((d) => ({
                       value: d.id,
                       label: d.name,
                     }))}
@@ -163,17 +140,26 @@ const CreatePost: NextPage<TProps> = ({
 
 export default CreatePost;
 
-export async function getStaticProps() {
-  const allPostsData = getSortedPostsData();
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session: Session | null = await getSession({ req: context.req });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login", // Redirect to the login page if not logged in
+        permanent: false,
+      },
+    };
+  }
+  const user = session?.user ?? null;
   const category = await prisma.category.findMany();
 
-  console.log(allPostsData + "allPosts");
   return {
     props: {
-      data: {
-        allPostsData,
-        category,
-      },
+      user: user,
+      category,
     },
   };
-}
+};

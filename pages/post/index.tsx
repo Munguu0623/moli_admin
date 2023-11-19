@@ -1,35 +1,25 @@
-import { NextPage } from "next";
-import HomeLayout from "../components/Layout";
-import Editor from "../components/common/Editor";
+import { GetServerSidePropsContext, NextPage } from "next";
+import HomeLayout from "@/components/Layout";
 import React, { useState } from "react";
-import { Button, Form, Input, Select, Tag } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { getSortedPostsData } from "../lib/posts";
-import MarkdownRenderer from "../components/markdown-render";
-import { Notif } from "../components/notification";
+import { Session } from "next-auth";
+import { getSession } from "next-auth/react";
+import { Notification } from "@/components/notification";
 
 type TProps = {
-  data: {
-    allPostsData: {
-      content: string; // Add this line to specify the type of 'content'
-    }[];
-  };
+  user: any;
 };
 
-const CreatePost: NextPage<TProps> = ({ data: allPostsData }) => {
+const CreatePost: NextPage<TProps> = ({ user }) => {
   const [type, setType] = useState("");
-  // const [body, setBody] = useState(post?.body || "");
-  const firstPostContent = allPostsData.allPostsData[0].content; // how to fix this is error Property 'content' does not exist on type 'string'?
-  console.log(type + "type");
 
   const submitBlog = () => {
     type == ""
-      ? Notif("Анхаар", "Та нийтлэх төрөл сонгоогүй байна!!!", "warning")
+      ? Notification("Анхаар", "Та нийтлэх төрөл сонгоогүй байна!!!", "warning")
       : "";
   };
 
   return (
-    <HomeLayout>
+    <HomeLayout menu={user.menu}>
       <div>this is post</div>
     </HomeLayout>
   );
@@ -37,14 +27,23 @@ const CreatePost: NextPage<TProps> = ({ data: allPostsData }) => {
 
 export default CreatePost;
 
-export async function getStaticProps() {
-  const allPostsData = getSortedPostsData();
-  console.log(allPostsData + "allPosts");
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session: Session | null = await getSession({ req: context.req });
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login", // Redirect to the login page if not logged in
+        permanent: false,
+      },
+    };
+  }
+  const user = session?.user ?? null;
+
   return {
     props: {
-      data: {
-        allPostsData,
-      },
+      user: user,
     },
   };
-}
+};

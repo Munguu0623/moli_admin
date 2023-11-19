@@ -29,14 +29,16 @@ model Category {
 }
 
 model Menu {
-  id           String    @id
-  name         String?   @db.NVarChar(100)
-  parentMenuId String?   @db.VarChar(100)
-  menuType     String?   @db.VarChar(100)
+  id           String     @id
+  name         String?    @db.NVarChar(100)
+  parentMenuId String?    @db.VarChar(100)
+  menuType     String?    @db.VarChar(100)
   menuUrl      String?
   isVisible    Int?
+  viewOrder    Int?
   createdDate  DateTime?
   modifiedDate DateTime?
+  RoleMenu     RoleMenu[]
 }
 
 model RoleMenu {
@@ -44,6 +46,7 @@ model RoleMenu {
   roleId      String   @db.VarChar(100)
   menuId      String   @db.VarChar(100)
   createdDate DateTime
+  menu        Menu     @relation(fields: [menuId], references: [id]) // Add this line to establish the relation
 }
 
 model Users {
@@ -54,5 +57,6 @@ model Users {
   email        String?   @unique @db.NVarChar(100)
   createdDate  DateTime  @db.DateTime
   modifiedDate DateTime? @db.DateTime
+  roleId       String?   @db.NVarChar(100)
   Blogs        Blogs[]
 }

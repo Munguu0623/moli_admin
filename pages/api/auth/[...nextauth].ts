@@ -17,41 +17,72 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       authorize: async (credentials) => {
-        console.log(credentials.email, "-----");
         const user = await prisma.users.findUnique({
           where: { email: credentials.email },
         });
-        console.log(user, "user------");
         if (!user || user.password !== credentials.password) {
           return null;
         }
 
         const { password, ...rest } = user;
-        console.log(password, rest, ' rest');
+        const result = await prisma.menu.findMany({
+          where: {
+            RoleMenu: {
+              some: {
+                roleId: 'writer'
+              }
+            },
+            isVisible: 1
+          },
+          select: {
+            id: true,
+            name: true,
+            parentMenuId: true,
+            menuType: true,
+            menuUrl: true,
+            isVisible: true,
+            viewOrder: true
+          }
+        });
         return {
           ...rest,
-          id: user.id.toString()
+          name: user.firstName,
+          id: user.id + '',
+          menu: result
         };
       }
     })
   ],
   pages: {
     signIn: "/login",
-    error: "/login",
+    error: "/500",
   },
   callbacks: {
-    async session({ session, token, user }: any) {
+    session({ session, token }: any) {
       return {
         ...session,
         user: {
           ...session.user,
-          id: user.id.toString(),
-          email: user.email,
+          id: token.id + '',
+          roleId: token.roleId,
+          menu: token.menu
         },
       };
+    },
+    jwt: ({ token, user }) => {
+      if (user) {
+        const u = user as unknown as any;
+        return {
+          ...token,
+          id: u.id,
+          roleId: u.roleId,
+          menu: u.menu
+        };
+      }
+      return token;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
 
-  adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma),
 });

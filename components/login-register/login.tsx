@@ -20,9 +20,7 @@ interface IFormValues {
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [islogin, setIsLogin] = useState(true);
-  const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
-  };
+  const handleChange = (value: string) => {};
   return (
     <>
       <img src="/wave.png" className="fixed hidden lg:block inset-0 h-full" />
@@ -134,9 +132,9 @@ const LoginForm = () => {
               onChange={handleChange}
               options={[
                 { value: "default", label: "Хэрэглчийн төрөл сонгох" },
-                { value: "couch", label: "Зөвөлгөө өгөх" },
-                { value: "blogWrite", label: "Блог бичих" },
-                { value: "simple", label: "Энгийн хэрэглэгч" },
+                { value: "instructor", label: "Зөвөлгөө өгөх" },
+                { value: "writer", label: "Блог бичих" },
+                { value: "viewer", label: "Энгийн хэрэглэгч" },
               ]}
             />
             <Button

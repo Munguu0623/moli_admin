@@ -7,7 +7,6 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.body.form, 'bpu');
   // const { title, content, authorEmail } = req.body;
   const result = await prisma.blogs.create({
     data: req.body.form,
